@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字段提示</title>
+    <style>
+      body{
+        width: 100vw;
+        height: 100vh;
+        margin: 0px;
+        background: -moz-linear-gradient(top, #11a6ff 0%, #ffffff 100%) no-repeat;
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#11a6ff), color-stop(100%,#ffffff)) no-repeat;
+        background: -webkit-linear-gradient(top, #11a6ff 0%,#ffffff 100%) no-repeat;
+        background: -o-linear-gradient(top, #11a6ff 0%,#ffffff 100%) no-repeat;
+        background: -ms-linear-gradient(top, #11a6ff 0%,#ffffff 100%) no-repeat;
+        background: linear-gradient(to bottom, #11a6ff 0%,#ffffff 100%) no-repeat;
+      }
+      ul,li{ 
+        padding: 0;
+        margin: 0;
+        list-style: none
+      }
+      .header_banner{
+        /* height: 153px; */
+        /* background: url(../../img/propTip/banner.png) no-repeat top center; */
+      }
+      .section{
+        width: 970px;
+        background: #f9f9f9;
+        margin: 0 auto;
+        padding: 15px
+      }
+      .section_file{
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+      }
+      .file_label{
+        display: inline-block;
+        width: 90px;
+        align-self: flex-start;
+        text-align: right;
+        padding-right: 10px;
+      }
+      .file_ul a{
+        text-decoration: none;
+      }
+    </style>
+    <script type="text/javascript" src="../js/ajax.js"></script>
+    <script type="text/javascript">
+      window.onload = function(){
+        let ajax = ajax_method
+        let urlParamasArr = window.location.href.split("?")[window.location.href.split("?").length-1].split("&")
+        let urlParamasObj = {}
+        urlParamasArr.forEach(item=>{
+          urlParamasObj[item.split("=")[0]] = item.split("=")[1]
+        })
+        urlParamasObj.colId = 163876
+        console.log(document.referrer,"------document.referrer")
+        console.log(window.location.origin,"------window.location.origin")
+        let baseUrl = window.location.origin
+        let url = `${baseUrl}/api/blade-system/basedevelop/getColProperty`
+        let data = `colid=${urlParamasObj.colId}`
+        function success(resStr){
+          let avueUeditor = document.querySelector(".avue-ueditor")
+          let filelabel = document.querySelector(".file_label")
+          let fileul = document.querySelector(".file_ul") 
+          let resObj = JSON.parse(resStr) 
+          let {data:{data:res}} = resObj
+          if(res.ID){
+            avueUeditor.innerHTML = res.TEXTAREA
+            if(res.fileinfo.records.length > 0){
+              filelabel.innerHTML = `附件：`
+              let resFile = res.fileinfo.records
+              resFile.forEach(file=>{
+                let ele = document.createElement('li')
+                let a = document.createElement('a')
+                let ext = file['SAVE_NAME'].slice(file['SAVE_NAME'].lastIndexOf('.'))
+                a.href = file['SAVE_PATH']
+                a.innerHTML = `${file['SHOW_NAME']}${ext}`
+                ele.appendChild(a)
+                fileul.appendChild(ele)
+              })             
+            }
+          }else{
+            avueUeditor.innerHTML = ""
+            filelabel.innerHTML = ``
+            let childs = fileul.childNodes; 
+            for(let i = childs.length - 1; i >= 0; i--) { 
+              fileul.removeChild(childs[i]); 
+            }
+          }
+        }
+        ajax(url,data,'get',success)
+      }
+    </script>
+</head>
+<body>
+  <header class="header">
+    <div class="header_banner">
+    </div>
+  </header>
+  <section class="section">
+    <avue-ueditor class="avue-ueditor"></avue-ueditor>
+    <div class="section_file">
+      <div class="file_label"></div>
+      <ul class="file_ul"></ul>
+    </div>
+  </section> 
+</body>
+</html>

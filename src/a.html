@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>作用域插槽
+        </title>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <child>
+                <template #demo="myScope"><!-- #myname等同于v-slot:myname,等同于2.5具名插槽旧语法slot="myname" -->
+                  <p>{{myScope.myItem}}</p>
+                </template>
+                <template #default="myScope1"><!-- 注意这里是v-slot="myScope1"不是slot="myScope1"，要和具名插槽的旧语法区别开 -->
+                    <h2>{{myScope1.myItem}}</h2>
+                </template>
+            </child>
+        </div>
+        <script> 
+            Vue.component('child', {
+                data() {
+                    return {
+                        list: [1, 2, 3, 4]
+                    }
+                },
+                template: `<div>
+                                <ul>
+                                    <slot v-for="item of list"
+                                    :myItem=item>
+                                    </slot>
+                                    <slot name="demo" :myItem=list></slot>
+                                </ul>
+                           </div>`
+            })
+            var vm = new Vue({
+                el: "#app"
+            })
+        </script>
+    </body>
+</html>
